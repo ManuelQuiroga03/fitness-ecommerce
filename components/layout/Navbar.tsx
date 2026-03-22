@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ShoppingBag, Menu, Search, User } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-
+import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export function Navbar() {
@@ -12,6 +12,11 @@ export function Navbar() {
   const toggleCart = useCartStore((state) => state.toggleCartDrawer);
   
   const user = useAuthStore((state) => state.user);
+  const initialize = useAuthStore((state) => state.initialize);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-zinc-200 dark:border-white/10 transition-colors duration-300">
@@ -38,10 +43,25 @@ export function Navbar() {
             <Search size={20} />
           </button>
           
-          <Link href="/login" className="flex items-center gap-2 hover:text-zinc-500 dark:hover:text-zinc-300 transition-colors text-sm font-bold">
-            <User size={20} />
-            <span className="hidden lg:inline">{user ? `Hola, ${user.name}` : 'Iniciar Sesión'}</span>
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-4 text-sm font-bold">
+              <Link href="/mis-compras" className="flex items-center gap-2 hover:text-zinc-500 dark:hover:text-zinc-300 transition-colors">
+                <User size={20} />
+                <span className="hidden lg:inline">Hola, {user.name}</span>
+              </Link>
+              <button 
+                onClick={() => useAuthStore.getState().logout()}
+                className="hover:text-red-500 transition-colors uppercase tracking-widest text-xs"
+              >
+                Salir
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" className="flex items-center gap-2 hover:text-zinc-500 dark:hover:text-zinc-300 transition-colors text-sm font-bold">
+              <User size={20} />
+              <span className="hidden lg:inline">Iniciar Sesión</span>
+            </Link>
+          )}
 
           <button 
             className="flex items-center gap-2 hover:text-zinc-500 dark:hover:text-zinc-300 transition-colors relative"

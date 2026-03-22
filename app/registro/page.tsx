@@ -1,13 +1,12 @@
 "use client";
 
-import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { UserPlus } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function RegisterPage() {
-  const login = useAuthStore((state) => state.login);
   const router = useRouter();
   
   const [name, setName] = useState("");
@@ -15,8 +14,9 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -25,9 +25,23 @@ export default function RegisterPage() {
       return;
     }
     
-    // Simulate registration
-    login(name, email);
-    router.push("/");
+    setLoading(true);
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+        emailRedirectTo: `${window.location.origin}/login`
+      }
+    });
+    setLoading(false);
+
+    if (signUpError) {
+      setError(signUpError.message);
+    } else {
+      alert("¡Registro exitoso! Por favor, revisa tu correo electrónico para confirmar tu cuenta.");
+      router.push("/login");
+    }
   };
 
   return (
@@ -94,9 +108,10 @@ export default function RegisterPage() {
           </div>
           <button 
             type="submit"
-            className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 rounded hover:bg-zinc-800 dark:hover:bg-gray-200 transition-colors mt-2 shadow-lg"
+            disabled={loading}
+            className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 rounded hover:bg-zinc-800 dark:hover:bg-gray-200 transition-colors mt-2 shadow-lg disabled:opacity-50"
           >
-            Registrarse
+            {loading ? "Registrando..." : "Registrarse"}
           </button>
         </form>
 

@@ -2,6 +2,9 @@ import { getProducts } from "@/lib/api/products";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { FilterBarWrapper } from "@/components/catalog/FilterBarWrapper";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function CatalogPage({
   searchParams,
 }: {

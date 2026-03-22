@@ -3,6 +3,9 @@ import Link from "next/link";
 import { getFeaturedProducts } from "@/lib/api/products";
 import { ProductCard } from "@/components/ui/ProductCard";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
   const featuredProducts = await getFeaturedProducts();
 

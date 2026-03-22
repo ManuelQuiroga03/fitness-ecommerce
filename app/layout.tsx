@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans bg-white text-zinc-950 dark:bg-black dark:text-white selection:bg-red-600 selection:text-white transition-colors duration-300`}>
+      <body className={`${inter.variable} font-sans bg-white text-zinc-950 dark:bg-black dark:text-white selection:bg-red-600 selection:text-white transition-colors duration-300`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
           <main className="min-h-screen">

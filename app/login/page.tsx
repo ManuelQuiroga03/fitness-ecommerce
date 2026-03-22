@@ -1,26 +1,38 @@
 "use client";
 
-import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { Dumbbell } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
-  const login = useAuthStore((state) => state.login);
   const router = useRouter();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
     
-    // Simulate login extracting name from email
-    const name = email.split('@')[0];
-    login(name, email);
-    router.push("/");
+    setError("");
+    setLoading(true);
+    
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    setLoading(false);
+
+    if (signInError) {
+      setError(signInError.message);
+    } else {
+      router.push("/");
+    }
   };
 
   return (
@@ -33,6 +45,12 @@ export default function LoginPage() {
           <h1 className="text-2xl font-black uppercase tracking-widest text-zinc-900 dark:text-white">Iniciar Sesión</h1>
           <p className="text-sm text-zinc-500 text-center mt-2">Ingresa a tu cuenta para continuar tus compras y ver tu historial.</p>
         </div>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500 text-red-500 text-sm font-bold px-4 py-3 rounded mb-6 text-center">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
           <div>
@@ -59,9 +77,10 @@ export default function LoginPage() {
           </div>
           <button 
             type="submit"
-            className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 rounded hover:bg-zinc-800 dark:hover:bg-gray-200 transition-colors mt-2 shadow-lg"
+            disabled={loading}
+            className="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-4 rounded hover:bg-zinc-800 dark:hover:bg-gray-200 transition-colors mt-2 shadow-lg disabled:opacity-50"
           >
-            Entrar
+            {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
